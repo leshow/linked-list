@@ -1,0 +1,6 @@
+[package]
+name = "too_many_lists"
+version = "0.1.0"
+authors = ["Evan Cameron <cameron.evan@gmail.com>"]
+
+[dependencies]

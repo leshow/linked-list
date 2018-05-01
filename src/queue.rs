@@ -1,3 +1,4 @@
+use std::iter::FromIterator;
 use std::marker::PhantomData;
 use std::mem;
 use std::ptr::NonNull;
@@ -154,6 +155,14 @@ impl<'a, A> Extend<A> for Queue<'a, A> {
         for elem in iter {
             self.push(elem);
         }
+    }
+}
+
+impl<'a, T> FromIterator<T> for Queue<'a, T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut q = Queue::new();
+        q.extend(iter);
+        q
     }
 }
 

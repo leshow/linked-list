@@ -1,3 +1,4 @@
+use std::iter::FromIterator;
 use std::marker::PhantomData;
 use std::mem;
 use std::ptr::NonNull;
@@ -150,6 +151,14 @@ impl<'a, A> Extend<A> for List<'a, A> {
         for elem in iter {
             self.push(elem);
         }
+    }
+}
+
+impl<'a, T> FromIterator<T> for List<'a, T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut l = List::new();
+        l.extend(iter);
+        l
     }
 }
 

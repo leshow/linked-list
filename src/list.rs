@@ -4,10 +4,10 @@ use std::mem;
 use std::ptr::NonNull;
 
 #[derive(Debug, Hash)]
-pub struct List<'a, T: 'a> {
+pub struct List<T> {
     head: Option<NonNull<Node<T>>>,
     tail: Option<NonNull<Node<T>>>,
-    _marker: PhantomData<&'a Node<T>>,
+    _marker: PhantomData<Box<Node<T>>>,
     len: usize,
 }
 
@@ -17,7 +17,7 @@ struct Node<T> {
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<'a, T> List<'a, T> {
+impl<T> List<T> {
     pub fn new() -> Self {
         List {
             head: None,
@@ -50,7 +50,7 @@ impl<'a, T> List<'a, T> {
         })
     }
 
-    pub fn append(&mut self, right: &mut List<'a, T>) {
+    pub fn append(&mut self, right: &mut List<T>) {
         match self.tail {
             None => mem::swap(self, right),
             Some(mut tail) => {
@@ -85,7 +85,7 @@ impl<'a, T> List<'a, T> {
             .map(|head| unsafe { &mut (*head.as_ptr()).elem })
     }
 
-    pub fn iter(&self) -> Iter<'a, T> {
+    pub fn iter<'a>(&self) -> Iter<'a, T> {
         Iter {
             next: self.head.as_ref().map(|h| unsafe { &(*h.as_ptr()) }),
         }
@@ -98,16 +98,16 @@ impl<'a, T> List<'a, T> {
     }
 }
 
-impl<'a, T> IntoIterator for List<'a, T> {
+impl<T> IntoIterator for List<T> {
     type Item = T;
-    type IntoIter = IntoIter<'a, T>;
-    fn into_iter(self) -> IntoIter<'a, T> {
+    type IntoIter = IntoIter<T>;
+    fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
 }
 
 #[derive(Debug)]
-pub struct IntoIter<'a, T: 'a>(List<'a, T>);
+pub struct IntoIter<T>(List<T>);
 
 #[derive(Debug)]
 pub struct Iter<'a, T: 'a> {
@@ -119,7 +119,7 @@ pub struct IterMut<'a, T: 'a> {
     next: Option<&'a mut Node<T>>,
 }
 
-impl<'a, T> Iterator for IntoIter<'a, T> {
+impl<'a, T> Iterator for IntoIter<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.pop()
@@ -146,7 +146,7 @@ impl<'a, T> Iterator for IterMut<'a, T> {
     }
 }
 
-impl<'a, A> Extend<A> for List<'a, A> {
+impl<A> Extend<A> for List<A> {
     fn extend<T: IntoIterator<Item = A>>(&mut self, iter: T) {
         for elem in iter {
             self.push(elem);
@@ -154,7 +154,7 @@ impl<'a, A> Extend<A> for List<'a, A> {
     }
 }
 
-impl<'a, T> FromIterator<T> for List<'a, T> {
+impl<'a, T> FromIterator<T> for List<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut l = List::new();
         l.extend(iter);

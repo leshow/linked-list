@@ -1,6 +1,6 @@
 use std::{iter::FromIterator, marker::PhantomData, mem, ptr::NonNull};
 
-#[derive(Debug)]
+#[derive(Debug, Hash)]
 pub struct Queue<T> {
     head: Option<NonNull<Node<T>>>,
     tail: Option<NonNull<Node<T>>>,
@@ -8,10 +8,16 @@ pub struct Queue<T> {
     len: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Hash)]
 struct Node<T> {
     elem: T,
     next: Option<NonNull<Node<T>>>,
+}
+
+impl<T: Default> Default for Queue<T> {
+    fn default() -> Self {
+        Queue::new()
+    }
 }
 
 impl<T> Queue<T> {
@@ -70,7 +76,7 @@ impl<T> Queue<T> {
         self.len
     }
 
-    pub fn empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len == 0
     }
 

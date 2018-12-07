@@ -1,7 +1,4 @@
-use std::iter::FromIterator;
-use std::marker::PhantomData;
-use std::mem;
-use std::ptr::NonNull;
+use std::{iter::FromIterator, marker::PhantomData, mem, ptr::NonNull};
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -103,8 +100,9 @@ impl<T> Queue<T> {
 }
 
 impl<T> IntoIterator for Queue<T> {
-    type Item = T;
     type IntoIter = IntoIter<T>;
+    type Item = T;
+
     fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
@@ -125,6 +123,7 @@ pub struct IterMut<'a, T: 'a> {
 
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
+
     fn next(&mut self) -> Option<Self::Item> {
         self.0.pop()
     }
@@ -132,6 +131,7 @@ impl<T> Iterator for IntoIter<T> {
 
 impl<'a, T> Iterator for Iter<'a, T> {
     type Item = &'a T;
+
     fn next(&mut self) -> Option<Self::Item> {
         self.next.map(|node| {
             self.next = node.next.as_ref().map(|n| unsafe { &(*n.as_ptr()) });
@@ -142,6 +142,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
 
 impl<'a, T> Iterator for IterMut<'a, T> {
     type Item = &'a mut T;
+
     fn next(&mut self) -> Option<Self::Item> {
         self.next.take().map(|node| {
             self.next = node.next.as_mut().map(|n| unsafe { &mut (*n.as_ptr()) });

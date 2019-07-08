@@ -1,4 +1,5 @@
-use std::{iter::FromIterator, marker::PhantomData, mem, ptr::NonNull};
+use alloc::boxed::Box;
+use core::{iter::FromIterator, marker::PhantomData, mem, ptr::NonNull};
 
 #[derive(Debug, Hash)]
 pub struct List<T> {
